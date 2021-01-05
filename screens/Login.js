@@ -1,5 +1,6 @@
 import React from 'react';
-import {Text, TextInput, View, StyleSheet, Button} from 'react-native';
+import {Text, TextInput, View, StyleSheet, Button, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import useForm from '../hooks/useForm'
 
 const styles = StyleSheet.create({
@@ -29,7 +30,26 @@ export default ({ navigation }) => {
         password: ''
     }
     const onSubmit = values => {
-        console.log(values);
+        fetch('https://serverless.alejandropavlotsky.vercel.app/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'Application/json'
+            },
+            body: JSON.stringify(values),
+        })
+        .then(x => x.text())
+        .then(x => {
+            try{
+                return JSON.parse(x)
+            }catch{
+                throw x
+            }
+        }) 
+        .then(x => {
+            AsyncStorage.setItem('token', x.token)
+            navigation.navigate('Meals')
+        })
+        .catch(e => Alert.alert('Error', e))
     }
     const { subscribe, inputs, handleSubmit } = useForm(initialState, onSubmit)
     return(
@@ -37,6 +57,7 @@ export default ({ navigation }) => {
             <Text style={styles.title}>Iniciar sesión</Text>
 
             <TextInput 
+            autoCapitalize='none'
             value={inputs.email} 
             onChangeText={subscribe('email')} 
             style={styles.input} 
@@ -44,6 +65,7 @@ export default ({ navigation }) => {
             />
 
             <TextInput 
+            autoCapitalize='none'
             value={inputs.password} 
             onChangeText={subscribe('password')} 
             style={styles.input} 
