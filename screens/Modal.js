@@ -24,7 +24,7 @@ export default ({navigation}) => {
             {
                 loading 
                 ? 
-                <Text>Cargando...</Text> 
+                <Text>Cargando.....</Text> 
                 : 
                 <>
                     <Text>{meals._id}</Text>
